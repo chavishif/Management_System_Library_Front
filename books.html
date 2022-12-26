@@ -81,6 +81,8 @@
                 2 - up to 5 days
                 <br>
                 3 - up to 2 days
+                <br>
+                Book's status: <input type="checkbox" id="book_status" value="on" required>
             </div>
 
             <!-- Modal footer -->
@@ -128,7 +130,7 @@
 
         //////////////////////////////Book's crud/////////////////////////////////////////       
 
-        const MY_SERVER = "https://library-management-system-bclo.onrender.com/books/"
+        const MY_SERVER = "http://127.0.0.1:5000/books/"
         axios.get(MY_SERVER).then(res => console.log(res.data))
 
         //Read-load dataBooks from server
@@ -140,7 +142,7 @@
                     <th><center>Author</th>
                     <th><center>Year published</th>
                     <th><center>Book type</th>
-                    <th><center>Actions</th></tr>`;
+                    <th><center>Book Status</th></tr>`;
             display.innerHTML = res.data.filter(book => book.name.toLowerCase().includes(sr.value.toLowerCase())).map(book => {
                 table += `<tr>`;
                 table += `<td><center>${book.book_id} <br> <img src="Images/book.jpeg" height="80" width="100" </td>`;
@@ -148,9 +150,9 @@
                 table += `<td><center>${book.author}</td>`;
                 table += `<td><center>${book.year_published}</td>`;
                 table += ` <td><center>  ${book.book_type}</td>`;
-                table += `<td><center><button type="button"
-                             class="btn btn-danger" onclick="DelBook(${book.book_id})" 
-                             >Delete book</button></td>`;
+                table += `<td><center>Click on the button <br>
+                   To change Book's status <br><button onclick="UpdBook(${book.book_id})"
+                   class="btn btn-danger">${book.book_status}</button></td>`;
                 table += `</tr>`;
             });
             table += "</table>";
@@ -161,44 +163,48 @@
 
         // Create-add a resorce from client to dataBooks from server 
         const AddBook = async () => {
-            if ((b_name.value.length > 2) && (author.value.length > 2) && (year_published.value.length > 0) && (book_type.value.length == 1) && (book_type.value == 1) || (book_type.value == 2) || (book_type.value == 3))
-                await axios.post(MY_SERVER, { name: b_name.value, author: author.value, year_published: year_published.value, book_type: book_type.value }).then((res) => console.log(res.data))
+            if ((b_name.value.length > 2) && (author.value.length > 2) && (year_published.value.length > 0) && (book_type.value.length == 1) && (book_type.value == 1) || (book_type.value == 2) || (book_type.value == 3) || (book_status.length > 0 ))
+                await axios.post(MY_SERVER, { name: b_name.value, author: author.value, year_published: year_published.value, book_type: book_type.value,book_status:book_status.value }).then((res) => console.log(res.data))
             else {
                 // Display message if the fields are empty
-                if (!((b_name.value.length > 2) && (author.value.length > 2) && (year_published.value.length > 0) && (book_type.value.length == 1)))
-                 { { FieldsEmpty() } }
+                if (!((b_name.value.length > 2) && (author.value.length > 2) && (year_published.value.length > 0) && (book_type.value.length == 1) )) { { FieldsEmpty() } }
                 // Display message if the book type field is not between 1-3
-                else if ((book_type.value != 1) || (book_type.value != 2) || (book_type.value != 3))
-                 { wrong_book_type() }
+                else if ((book_type.value != 1) || (book_type.value != 2) || (book_type.value != 3)) { wrong_book_type() }
             }
         }
 
-        // Delete-dataBooks from server
-        const DelBook =  (id) => {
-            const Del_book =  () => {  axios.delete(MY_SERVER + id).then((res) => console.log(res.data)) }
-            DeleteBookMassage()
-            setTimeout(Del_book, 2000)
+       
+        // Update -change book's status on/off 
+        const UpdBook = async (id) => {
+            if (book_status.value == 'on') {
+                book_status.value = 'off';
+                book_status.innerHTML = 'off';
+            }
+            else {
+                book_status.value = 'on'; book_status.innerHTML = 'on';
+            }
+            await axios.put(MY_SERVER + id, { book_status: book_status.value }).then((res) => console.log(res.data))
         }
 
-        
+
         ///////////////////////////////////////////////////////////Tostify////////////////////////////////////////////////////////////////////
 
         // Toastify - Message by Deleting a book 
-        const DeleteBookMassage = () =>
-            Toastify({
-                text: "The book was successfully deleted",
-                duration: 3000,
-                destination: "https://github.com/apvarun/toastify-js",
-                newWindow: true,
-                close: true,
-                gravity: "top", // `top` or `bottom`
-                position: "center", // `left`, `center` or `right`
-                stopOnFocus: true, // Prevents dismissing of toast on hover
-                style: {
-                    background: "linear-gradient(to right, #00b09b, #384955)",
-                },
-                onClick: function () { } // Callback after click
-            }).showToast();
+        // const Updatebook = () =>
+        //     Toastify({
+        //         text: "The book is not active",
+        //         duration: 3000,
+        //         destination: "https://github.com/apvarun/toastify-js",
+        //         newWindow: true,
+        //         close: true,
+        //         gravity: "top", // `top` or `bottom`
+        //         position: "center", // `left`, `center` or `right`
+        //         stopOnFocus: true, // Prevents dismissing of toast on hover
+        //         style: {
+        //             background: "linear-gradient(to right, #00b09b, #384955)",
+        //         },
+        //         onClick: function () { } // Callback after click
+        //     }).showToast();
 
         // Toastify - Message by empty fields 
         const FieldsEmpty = () =>
