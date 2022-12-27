@@ -66,7 +66,7 @@
 
                 <!-- Fields in Add a book content  -->
                 Name of book:
-                <br><input type="text" placeholder="book name" id="b_name" maxlength="30" required><br>
+                <br><input type="text" placeholder="book name" id="book_name" maxlength="30" required><br>
 
                 The author of the book:
                 <br><input type="text" placeholder="book author" id="author" maxlength="30" required><br>
@@ -83,6 +83,7 @@
                 3 - up to 2 days
                 <br>
                 Book's status: <input type="checkbox" id="book_status" value="on" required>
+              
             </div>
 
             <!-- Modal footer -->
@@ -130,29 +131,32 @@
 
         //////////////////////////////Book's crud/////////////////////////////////////////       
 
-        const MY_SERVER = "http://127.0.0.1:5000/books/"
+        const MY_SERVER = "https://library-management-4y9o.onrender.com/books/"
         axios.get(MY_SERVER).then(res => console.log(res.data))
 
         //Read-load dataBooks from server
         const LoadBooks = async (books) => {
             const res = await axios.get(MY_SERVER)
             let table = '<table >';
-            table += `<tr><th><center>ID</th>
+            table += `<tr><th><center>Book ID</th>
                     <th><center>Book Name</th>
                     <th><center>Author</th>
                     <th><center>Year published</th>
                     <th><center>Book type</th>
                     <th><center>Book Status</th></tr>`;
-            display.innerHTML = res.data.filter(book => book.name.toLowerCase().includes(sr.value.toLowerCase())).map(book => {
+                  
+            display.innerHTML = res.data.filter(book => book.book_name.toLowerCase().includes(sr.value.toLowerCase())).map(book => {
                 table += `<tr>`;
-                table += `<td><center>${book.book_id} <br> <img src="Images/book.jpeg" height="80" width="100" </td>`;
-                table += `<td><center>${book.name}</td>`;
+                table += `<td><center><img src="Images/book.jpeg" height="80" width="100" </td>`;
+                table += `<td><center>${book.book_name}</td>`;
                 table += `<td><center>${book.author}</td>`;
                 table += `<td><center>${book.year_published}</td>`;
                 table += ` <td><center>  ${book.book_type}</td>`;
                 table += `<td><center>Click on the button <br>
-                   To change Book's status <br><button onclick="UpdBook(${book.book_id})"
+                   To Delete = off / Activate = on <br><button onclick="UpdBook(${book.book_id})"
                    class="btn btn-danger">${book.book_status}</button></td>`;
+              
+                
                 table += `</tr>`;
             });
             table += "</table>";
@@ -163,18 +167,21 @@
 
         // Create-add a resorce from client to dataBooks from server 
         const AddBook = async () => {
-            if ((b_name.value.length > 2) && (author.value.length > 2) && (year_published.value.length > 0) && (book_type.value.length == 1) && (book_type.value == 1) || (book_type.value == 2) || (book_type.value == 3) || (book_status.length > 0 ))
-                await axios.post(MY_SERVER, { name: b_name.value, author: author.value, year_published: year_published.value, book_type: book_type.value,book_status:book_status.value }).then((res) => console.log(res.data))
+            if ((book_name.value.length > 2) && (author.value.length > 2) && (year_published.value.length > 0) && (book_type.value.length == 1 && ((book_type.value == 1) || (book_type.value == 2) || (book_type.value == 3))))
+                await axios.post(MY_SERVER, { book_name: book_name.value, author: author.value, year_published: year_published.value, book_type: book_type.value, book_status: book_status.value }).then((res) => console.log(res.data))
+
             else {
                 // Display message if the fields are empty
-                if (!((b_name.value.length > 2) && (author.value.length > 2) && (year_published.value.length > 0) && (book_type.value.length == 1) )) { { FieldsEmpty() } }
+                if (!((book_name.value.length > 2) && (author.value.length > 2) && (year_published.value.length > 0) && (book_type.value.length == 1) )) { { FieldsEmpty() } }
                 // Display message if the book type field is not between 1-3
                 else if ((book_type.value != 1) || (book_type.value != 2) || (book_type.value != 3)) { wrong_book_type() }
             }
         }
 
        
-        // Update -change book's status on/off 
+        //  Update -change status's book on/off (on- if the book is available in the library.
+        //                                       off- to delete a book.)
+ 
         const UpdBook = async (id) => {
             if (book_status.value == 'on') {
                 book_status.value = 'off';
@@ -189,24 +196,7 @@
 
         ///////////////////////////////////////////////////////////Tostify////////////////////////////////////////////////////////////////////
 
-        // Toastify - Message by Deleting a book 
-        // const Updatebook = () =>
-        //     Toastify({
-        //         text: "The book is not active",
-        //         duration: 3000,
-        //         destination: "https://github.com/apvarun/toastify-js",
-        //         newWindow: true,
-        //         close: true,
-        //         gravity: "top", // `top` or `bottom`
-        //         position: "center", // `left`, `center` or `right`
-        //         stopOnFocus: true, // Prevents dismissing of toast on hover
-        //         style: {
-        //             background: "linear-gradient(to right, #00b09b, #384955)",
-        //         },
-        //         onClick: function () { } // Callback after click
-        //     }).showToast();
-
-        // Toastify - Message by empty fields 
+        
         const FieldsEmpty = () =>
             Toastify({
                 text: "All fields need to be filled in",

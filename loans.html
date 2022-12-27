@@ -73,9 +73,7 @@
 
 
         <!-- Fields in Add a loan content  -->
-        <!-- customer id:<br><input type="number" minlength="1" id="customer_id" required><br>
-        book id:<br><input type="number" minlength="1" id="book_id" required><br> -->
-        <div class="input-group mb-3 input-group-lg">
+         <div class="input-group mb-3 input-group-lg">
           <span class="input-group-text" id="basic-addon1">👨🏼‍🎓</span>
           <select class="form-select" id="customer_id">
             <option value="" disabled selected hidden>Customer Name</option>
@@ -88,8 +86,16 @@
           </select>
         </div>
 
-        Loan date:<br><input type="date" id="loandate" name="date" required><br>
-        returndate:<br><input type="date" min="1900-03" max="2022-12" id="returndate" required><br>
+
+       
+        <div class="input-group mb-3 input-group-lg">
+          <span class="input-group-text" id="basic-addon1">🗓️</span>
+          <input id="loandate" class="form-control" placeholder=" Loan date" onfocus="(this.type='date')">
+        </div>
+        <br><div class="input-group mb-3 input-group-lg">
+          <span class="input-group-text" id="basic-addon1">🗓️</span>
+          <input id="returndate" class="form-control" placeholder=" Return date" onfocus="(this.type='date')">
+        </div>
         book type(1) - returndate up tp 10 days
         <br>
         book type(2) - returndate up to 5 days
@@ -145,9 +151,9 @@
 
     ///////////////////////////////Loans's crud///////////////////////////////////////////
 
-    const MY_SERVER = "http://127.0.0.1:5000/loans/"
-    const MY_SERVER_CUSTOMERS = "http://127.0.0.1:5000/customers/"
-    const MY_SERVER_BOOKS = "http://127.0.0.1:5000/books/"
+    const MY_SERVER = "https://library-management-4y9o.onrender.com/loans/"
+    const MY_SERVER_CUSTOMERS = "https://library-management-4y9o.onrender.com/customers/"
+    const MY_SERVER_BOOKS = "https://library-management-4y9o.onrender.com/books/"
     axios.get(MY_SERVER).then(res => console.log(res.data))
 
     let loan_status = ""
@@ -195,7 +201,7 @@
         {
 
           msg += `<tr>`;
-          msg += `<td><center>${loan.loan_id} <br> <img src="Images/loan.jpeg" height="80" width="100"></td>`;
+          msg += `<td><center><img src="Images/loan.jpeg" height="80" width="100"></td>`;
           msg += `<td><center>${loan.book_name}</td>`;
           msg += `<td><center>${loan.book_type}</td>`;
           msg += `<td><center>${loan.customer_name}</td>`;
@@ -221,7 +227,7 @@
     }
     getAllLoans()
 
-
+    // Check if the customer is active and display it.
     const getCusName = async () => {
       customers = await axios.get(MY_SERVER_CUSTOMERS)
       customer_id.innerHTML += customers.data.filter(customer => customer.customer_status == 'on').map(customer =>
@@ -231,18 +237,18 @@
 
     getCusName()
 
+    // Check if the book exists in the library and display it
+
     const getBookName = async () => {
-      loans = await axios.get(MY_SERVER)
-      
-      book_id.innerHTML += loans.data.filter(loan =>
-       ((loan.loan_activate == 'off') || (loan.book_status == 'on')) ).map(book =>
-        `<option value=${book.book_id}>${book.book_name}</option>`).join("")
+      books = await axios.get(MY_SERVER_BOOKS)
+      book_id.innerHTML += books.data.filter(book =>
+              book.book_status == 'on')
+       .map(book =>
+       `<option value=${book.book_id}>${book.book_name}</option>`).join("")
     }
     getBookName()
 
-
-
-
+    
 
     // Create-add a resorce from client to dataLoans from server
     const AddLoan = async () => {
@@ -253,7 +259,10 @@
         // Check if the fields of the customer id and book id are correct and post them
         if (customers.data.some(customer => customer_id.value == customer.customer_id) && books.data.some((book => book_id.value == book.book_id))) {
           console.log("yes")
-          axios.post(MY_SERVER, { customer_id: customer_id.value, book_id: book_id.value, loandate: loandate.value, returndate: returndate.value, loan_status: "ON_TIME", loan_activate: loan_activate.value })
+        
+          axios.post(MY_SERVER, { customer_id: customer_id.value, book_id: book_id.value,
+                                 loandate: loandate.value, returndate: returndate.value,
+                                  loan_status: "ON_TIME", loan_activate: loan_activate.value })
 
         }
         else {
@@ -271,11 +280,14 @@
           }
         }
     }
-    // Update -change book's status on/off 
+
+    // Update -change loan's status on/off(on-return a book,
+    //                                     off-it can't be pressed because the loan closed) 
     const UpdLoan = async (id) => {
       if (loan_activate.value == 'on') {
         loan_activate.value = 'off';
-       
+      
+  
       }
       await axios.put(MY_SERVER + id, { loan_activate: loan_activate.value }).then((res) => console.log(res.data))
     }

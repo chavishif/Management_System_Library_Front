@@ -121,7 +121,7 @@
     }
     ///////////////////////////////Customer's crud///////////////////////////////////////////
 
-    const MY_SERVER = "http://127.0.0.1:5000/customers/"
+    const MY_SERVER = "https://library-management-4y9o.onrender.com/customers/"
     axios.get(MY_SERVER).then(res => console.log(res.data))
 
     // Read-load dataCustomers from server
@@ -135,7 +135,7 @@
                 <th><center>Status</th></tr>`;
       display.innerHTML = res.data.filter(customer => customer.customer_name.toLowerCase().includes(sr.value.toLowerCase())).map(customer => {
         table += `<tr>`;
-        table += `<td><center>${customer.customer_id} <br><img src="Images/customer.jpeg" height="80" width="100" </td>`;
+        table += `<td><center><img src="Images/customer.jpeg" height="80" width="100" </td>`;
         table += `<td><center>${customer.customer_name}</td>`;
         table += `<td><center>${customer.city}</td>`;
         table += `<td><center>${customer.age}</td>`;
